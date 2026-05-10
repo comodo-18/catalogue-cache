@@ -1,0 +1,10 @@
+INSERT INTO PRODUCT (name, category, base_price, stock) VALUES ('Modern Sofa', 'FURNITURE', 499.99, 10);
+INSERT INTO PRODUCT (name, category, base_price, stock) VALUES ('Oak Dining Table', 'FURNITURE', 799.99, 5);
+INSERT INTO PRODUCT (name, category, base_price, stock) VALUES ('Office Chair', 'FURNITURE', 299.99, 20);
+INSERT INTO PRODUCT (name, category, base_price, stock) VALUES ('LED Desk Lamp', 'ELECTRONICS', 49.99, 50);
+INSERT INTO PRODUCT (name, category, base_price, stock) VALUES ('Bluetooth Speaker', 'ELECTRONICS', 89.99, 30);
+INSERT INTO PRODUCT (name, category, base_price, stock) VALUES ('4K Monitor', 'ELECTRONICS', 399.99, 15);
+INSERT INTO PRODUCT (name, category, base_price, stock) VALUES ('Bookshelf', 'FURNITURE', 199.99, 8);
+INSERT INTO PRODUCT (name, category, base_price, stock) VALUES ('Wireless Keyboard', 'ELECTRONICS', 69.99, 25);
+INSERT INTO PRODUCT (name, category, base_price, stock) VALUES ('Standing Desk', 'FURNITURE', 599.99, 7);
+INSERT INTO PRODUCT (name, category, base_price, stock) VALUES ('Webcam HD', 'ELECTRONICS', 79.99, 40);

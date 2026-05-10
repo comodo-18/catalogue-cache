@@ -5,6 +5,7 @@ import com.anurag.personalproject.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import com.anurag.personalproject.exception.ProductNotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +22,7 @@ public class ProductService {
     // Get one product by ID — throws error if not found
     public Product getProductById(Long id) {
         return productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found: " + id));
+                .orElseThrow(() -> new ProductNotFoundException(id));
     }
 
     // Get products filtered by category
@@ -32,5 +33,27 @@ public class ProductService {
     // Save a new product to DB
     public Product createProduct(Product product) {
         return productRepository.save(product);
+    }
+    public Product updateProduct(Long id, Product updatedProduct) {
+
+        // First check product exists — throws 404 if not
+        Product existing = getProductById(id);
+
+        // Update only the fields that were sent
+        existing.setName(updatedProduct.getName());
+        existing.setCategory(updatedProduct.getCategory());
+        existing.setBasePrice(updatedProduct.getBasePrice());
+        existing.setStock(updatedProduct.getStock());
+
+        // Save returns the updated product
+        return productRepository.save(existing);
+    }
+
+    public void deleteProduct(Long id) {
+
+        // Check product exists first — throws 404 if not
+        getProductById(id);
+
+        productRepository.deleteById(id);
     }
 }
