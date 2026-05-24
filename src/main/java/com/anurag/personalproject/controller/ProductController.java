@@ -1,6 +1,7 @@
 package com.anurag.personalproject.controller;
 
 import com.anurag.personalproject.entity.Product;
+import com.anurag.personalproject.service.CacheStatService;
 import com.anurag.personalproject.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final CacheStatService cacheStatService;
 
     // GET /api/products OR GET /api/products?category=FURNITURE
     @GetMapping
@@ -27,6 +29,7 @@ public class ProductController {
     // GET /api/products/1
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+        cacheStatService.recordRequest();
         return ResponseEntity.ok(productService.getProductById(id));
     }
 

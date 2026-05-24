@@ -3,16 +3,23 @@ package com.anurag.personalproject.service;
 import com.anurag.personalproject.entity.Product;
 import com.anurag.personalproject.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import com.anurag.personalproject.exception.ProductNotFoundException;
 
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductService {
 
     // Spring automatically injects ProductRepository here
     private final ProductRepository productRepository;
+    private final CacheStatService cacheStatService;
+    private final CacheInvalidationProducer cacheInvalidationProducer;
 
     // Get all products from DB
     public List<Product> getAllProducts() {
@@ -20,7 +27,10 @@ public class ProductService {
     }
 
     // Get one product by ID — throws error if not found
+    @Cacheable(value = "products", key = "#id")
     public Product getProductById(Long id) {
+        log.info("Cache MISS — fetching product from DB for id: {}", id);
+        cacheStatService.recordMiss();
         return productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
     }
@@ -34,6 +44,7 @@ public class ProductService {
     public Product createProduct(Product product) {
         return productRepository.save(product);
     }
+    @CacheEvict(value = "products", key = "#id")
     public Product updateProduct(Long id, Product updatedProduct) {
 
         // First check product exists — throws 404 if not
@@ -46,14 +57,19 @@ public class ProductService {
         existing.setStock(updatedProduct.getStock());
 
         // Save returns the updated product
-        return productRepository.save(existing);
+        Product saved =  productRepository.save(existing);
+        cacheInvalidationProducer.publishInvalidation(id, "UPDATED");
+        return  saved;
+
     }
 
+    @CacheEvict(value = "products", key = "#id")
     public void deleteProduct(Long id) {
 
         // Check product exists first — throws 404 if not
         getProductById(id);
 
         productRepository.deleteById(id);
+        cacheInvalidationProducer.publishInvalidation(id, "DELETED");
     }
 }
