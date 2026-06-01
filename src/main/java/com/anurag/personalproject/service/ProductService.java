@@ -4,6 +4,7 @@ import com.anurag.personalproject.entity.Product;
 import com.anurag.personalproject.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,8 @@ public class ProductService {
     // Spring automatically injects ProductRepository here
     private final ProductRepository productRepository;
     private final CacheStatService cacheStatService;
-    private final CacheInvalidationProducer cacheInvalidationProducer;
+    @Autowired(required = false)
+    private CacheInvalidationProducer cacheInvalidationProducer;
 
     // Get all products from DB
     public List<Product> getAllProducts() {
@@ -58,7 +60,9 @@ public class ProductService {
 
         // Save returns the updated product
         Product saved =  productRepository.save(existing);
-        cacheInvalidationProducer.publishInvalidation(id, "UPDATED");
+        if (cacheInvalidationProducer != null) {
+            cacheInvalidationProducer.publishInvalidation(id, "UPDATED");
+        }
         return  saved;
 
     }
@@ -70,6 +74,8 @@ public class ProductService {
         getProductById(id);
 
         productRepository.deleteById(id);
-        cacheInvalidationProducer.publishInvalidation(id, "DELETED");
+        if (cacheInvalidationProducer != null) {
+            cacheInvalidationProducer.publishInvalidation(id, "DELETED");
+        }
     }
 }
