@@ -3,6 +3,7 @@ package com.anurag.personalproject.service;
 import com.anurag.personalproject.event.CacheInvalidationEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import java.time.Instant;
@@ -10,6 +11,7 @@ import java.time.Instant;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@ConditionalOnProperty(name = "kafka.enabled", havingValue = "true", matchIfMissing = false)
 public class CacheInvalidationProducer {
 
     private final KafkaTemplate<String, CacheInvalidationEvent> kafkaTemplate;
