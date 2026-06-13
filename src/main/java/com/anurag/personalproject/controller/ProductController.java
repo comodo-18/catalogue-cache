@@ -3,6 +3,7 @@ package com.anurag.personalproject.controller;
 import com.anurag.personalproject.entity.Product;
 import com.anurag.personalproject.service.CacheStatService;
 import com.anurag.personalproject.service.ProductService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,9 +29,22 @@ public class ProductController {
 
     // GET /api/products/1
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+    public ResponseEntity<Product> getProductById(
+            @PathVariable Long id,
+            HttpServletResponse response) {
+
         cacheStatService.recordRequest();
-        return ResponseEntity.ok(productService.getProductById(id));
+
+        long start = System.currentTimeMillis();
+        Product product = productService.getProductById(id);
+        long ms = System.currentTimeMillis() - start;
+
+        String source = ProductService.responseSource.get();
+        if (source == null) source = "REDIS";
+        ProductService.responseSource.remove();
+
+        response.setHeader("X-Response-Source", source + " · " + ms + "ms");
+        return ResponseEntity.ok(product);
     }
 
     // POST /api/products

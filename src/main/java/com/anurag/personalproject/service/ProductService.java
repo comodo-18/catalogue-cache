@@ -20,6 +20,7 @@ public class ProductService {
     // Spring automatically injects ProductRepository here
     private final ProductRepository productRepository;
     private final CacheStatService cacheStatService;
+    public static final ThreadLocal<String> responseSource = new ThreadLocal<>();
     @Autowired(required = false)
     private CacheInvalidationProducer cacheInvalidationProducer;
 
@@ -33,6 +34,7 @@ public class ProductService {
     public Product getProductById(Long id) {
         log.info("Cache MISS — fetching product from DB for id: {}", id);
         cacheStatService.recordMiss();
+        responseSource.set("POSTGRES");
         return productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
     }
